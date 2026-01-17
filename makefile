@@ -1,35 +1,26 @@
 CC = gcc
 
-# Language / standard
 STD_FLAGS = -std=c99
-
-# Optimization
-OPT_FLAGS = -O2 -march=native -mtune=native -funroll-loops -fomit-frame-pointer
-
-# Link-time optimization
+OPT_FLAGS = -O2 -march=native -mtune=native -funroll-loops
 LTO_FLAGS = -flto
+WARN_FLAGS = -Wall -Werror
+INC_FLAGS = -Iinclude
 
-# Warnings
-WARN_FLAGS = -Wall -Wextra -Werror
-
-# Final flag groups
-CFLAGS = $(STD_FLAGS) $(OPT_FLAGS) $(LTO_FLAGS) $(WARN_FLAGS)
+CFLAGS = $(STD_FLAGS) $(OPT_FLAGS) $(LTO_FLAGS) $(WARN_FLAGS) $(INC_FLAGS)
 LDFLAGS = $(LTO_FLAGS)
 
-TARGET = 
-SRC = src/main.c
-OBJ = build/main.o
+TARGET = bin/sub-risc-emu
+
+SRC = src/main.c src/cpu.c src/decode.c src/stack.c src/util.c
+OBJ = build/main.o build/cpu.o build/decode.o build/stack.o build/util.o
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(CC) $(OBJ) $(LDFLAGS) -o $(TARGET)
 
-main.o: main.c
-	$(CC) $(CFLAGS) -c src/main.c -o build/main.o
-
-run: $(TARGET)
-	./$(TARGET)
+src/%.o: src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJ) $(TARGET)
